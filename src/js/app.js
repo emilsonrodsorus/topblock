@@ -3,6 +3,7 @@ App = {
   contracts: {},
 
   init: async function() {
+    App.countDown();
     return await App.initWeb3();
   },
 
@@ -27,8 +28,6 @@ App = {
       App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
     }
     web3 = new Web3(App.web3Provider);
-    console.log('loading auth');
-    console.log(web3);
     return App.initContract();
   },
 
@@ -42,8 +41,9 @@ App = {
       App.contracts.Blocks.setProvider(App.web3Provider);
     
       // Use our contract to retrieve and mark the adopted pets
-      App.markBlocked();
-      App.handleMintABlock("");
+      //App.markBlocked();
+      //App.handleMintABlock("");
+      App.validateUser();
       return App.markBlocked();
     });    
 
@@ -54,6 +54,18 @@ App = {
     $(document).on('click', '.btn-adopt', App.handleMintABlock);
   },
 
+  validateUser: () => {
+    var blockInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if(error) console.log(error);
+
+      if(accounts.length) {
+        $('#connect-link-section').text($('#connect-link-section').text().replace("Connect Wallet", "Connected"));
+      }
+    })
+  },
+
   markBlocked: function() {
     var blockInstance;
 
@@ -62,8 +74,6 @@ App = {
 
       return blockInstance.getBlockers.call();
     }).then(function(blockers) {
-      console.log('blockers');
-      console.log(blockers);
       for (i = 0; i < blockers.length; i++) {
         if (blockers[i] !== '0x0000000000000000000000000000000000000000') {
           $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
@@ -88,7 +98,8 @@ App = {
       }
 
       var account = accounts[0];
-
+      swal("Are you sure yoy want mint!");
+        
       App.contracts.Blocks.deployed().then(function(instance) {
         blockInstance = instance;
 
@@ -100,6 +111,41 @@ App = {
         console.log(err.message);
       });
     });
+  },
+
+  toDay: 3,
+  toHour: 0,
+  toMinute: 0,
+  toSecond: 0,
+
+  //cuenta atras
+  countDown: function(){
+
+    App.toSecond=App.toSecond-1;
+
+    if(App.toSecond<0){
+      App.toSecond=59;
+      App.toMinute=App.toMinute-1;
+    }
+
+    if(App.toMinute<0){
+      App.toMinute=59;
+      App.toHour=App.toHour-1;
+    }
+
+    if(App.toHour<0){
+      App.toHour=23;
+      App.toDay=App.toDay-1;
+    }
+
+    if(App.toDay<0) {
+      //final
+      swal("restarting!");      
+    }    
+    else{
+      $('.text-counter').text(`${App.toDay}d ${App.toHour}h ${App.toMinute}m ${App.toSecond}s`);
+      setTimeout(App.countDown,1000);
+    }
   }
 };
 

@@ -27,7 +27,7 @@ contract Blocks is ERC1155 {
 
         blockers[blockId] = msg.sender;
 
-        _mint(msg.sender, blockId, "", "");
+        _mint(msg.sender, blockId, 10, "");
 
         return blockId;
     }
