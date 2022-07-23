@@ -113,10 +113,10 @@ App = {
     });
   },
 
-  toDay: 3,
+  toDay: 0,
   toHour: 0,
   toMinute: 0,
-  toSecond: 0,
+  toSecond: 5,
 
   //cuenta atras
   countDown: function(){
@@ -140,12 +140,46 @@ App = {
 
     if(App.toDay<0) {
       //final
-      swal("restarting!");      
+      App.createNFT();  
     }    
     else{
       $('.text-counter').text(`${App.toDay}d ${App.toHour}h ${App.toMinute}m ${App.toSecond}s`);
       setTimeout(App.countDown,1000);
     }
+  },
+
+  // create NFT
+  createNFT: function(){
+    var ipfs = window.IpfsHttpClient.create({
+      host: 'ipfs.infura.io',
+      port: 5001,
+      protocol: 'https'
+    });
+    console.log('creating image'); 
+    domtoimage.toBlob(document.getElementById('canvas-wrapper'))
+    .then(function(blob) {
+      console.log('creating blob');
+      console.log(blob);      
+      new Response(blob).arrayBuffer().then(arrayBuffer => {
+        const buf = buffer.Buffer(arrayBuffer)
+        // ipfs.add(blob).then(cid => {
+        //   console.log(cid)
+        // }).catch(error => {
+        //   console.log(error);
+        // });
+        ipfs.add(buf).then(result => {
+          console.log('success ipfs');
+          console.log(result);
+        }).catch(error => {
+          console.log('fail ipfs');
+          console.log(error);
+        });
+      })
+      
+    }).catch(function (error){
+      console.log('error');
+      console.log(error);
+    });
   }
 };
 

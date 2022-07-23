@@ -16,6 +16,8 @@
     "lite-server": "^2.3.0"
   },
   "dependencies": {
+    "dom-to-image": "^2.6.0",
+    "ipfs-core": "^0.15.4",
     "openzeppelin-solidity": "^4.6.0",
     "truffle": "^5.5.17"
   }
